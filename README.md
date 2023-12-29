@@ -10,4 +10,5 @@ This project is based on [https://github.com/RealAscarre/UE4-Dumper] and has add
 - [Dump Skeleton]
 - [Pretty output]
 
-<img src="menu.PNG"/>
+
+![menu](https://github.com/Hollow-1/UE4-Dumper/assets/102737627/ab9bd4e0-b9c7-4e29-800f-4a383a018ab2)
