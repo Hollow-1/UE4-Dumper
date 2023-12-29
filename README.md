@@ -10,4 +10,4 @@ This project is based on [https://github.com/RealAscarre/UE4-Dumper] and has add
 - [Dump Skeleton]
 - [Pretty output]
 
-<img src="menu.png"/>
+<img src="menu.PNG"/>
