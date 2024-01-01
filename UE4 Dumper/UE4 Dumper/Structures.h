@@ -28,7 +28,7 @@ public:
     FName() : index(0), number(0) {}
     FName(UINT32 index, UINT32 number) : index(index), number(number) {}
 
-    //ÎªÁËÌí¼Ó½ø std::map£¬ ĞèÒªÖØÔØ < ÔËËã·û£¬mapÖ»Ê¹ÓÃ < ¾Í¿ÉÒÔ½øĞĞ¸÷ÖÖ±È½Ï
+    //ä¸ºäº†æ·»åŠ è¿› std::mapï¼Œ éœ€è¦é‡è½½ < è¿ç®—ç¬¦ï¼Œmapåªä½¿ç”¨ < å°±å¯ä»¥è¿›è¡Œå„ç§æ¯”è¾ƒ
     bool operator<(const FName& other)const {
         if (index != other.index) {
             return index < other.index;
@@ -38,9 +38,9 @@ public:
 
     string GetString() {
         string name = GetString(index);
-        //if (number != 0) {
-        //    name = name + "_" + std::to_string(number - 1);
-        //}
+        if (number != 0) {
+            name = name + "_" + std::to_string(number - 1);
+        }
         return name;
     }
 
@@ -104,19 +104,19 @@ public:
 };
 
 
-//ÀàµÄ³ÉÔ±±äÁ¿ºÍ³ÉÔ±º¯Êı
+//ç±»çš„æˆå‘˜å˜é‡å’Œæˆå‘˜å‡½æ•°
 struct ClassMember {
     StringTable variable;
     StringTable func;
 };
 struct SDKInfo {
-    //±£´æĞèÒªÊä³öµÄÀàµÄÖ¸Õë
+    //ä¿å­˜éœ€è¦è¾“å‡ºçš„ç±»çš„æŒ‡é’ˆ
     list<uintptr_t> finalClass;
 
-    //±£´æËùÓĞÀàµÄÖ¸ÕëºÍ¼Ì³ĞÂ·¾¶<ÀàµÄÖ¸Õë, list<¸¸ÀàÃû³Æ>>
+    //ä¿å­˜æ‰€æœ‰ç±»çš„æŒ‡é’ˆå’Œç»§æ‰¿è·¯å¾„<ç±»çš„æŒ‡é’ˆ, list<çˆ¶ç±»åç§°>>
     map<uintptr_t, list<FName>> pathMap;
 
-    //±£´æËùÓĞÀàºÍËüµÄ³ÉÔ±<ÀàÃû, ³ÉÔ±>
+    //ä¿å­˜æ‰€æœ‰ç±»å’Œå®ƒçš„æˆå‘˜<ç±»å, æˆå‘˜>
     map<FName, ClassMember> classMap;
 };
 
