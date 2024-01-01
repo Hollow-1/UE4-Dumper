@@ -159,7 +159,7 @@ void DumpActors(string out) {
         for (UINT32 i = 0; i < actorArray.count; i++) {
             uintptr_t actor = Read<uintptr_t>(actorArray.addr + (i * Offsets::PointerSize));
             if (UObject::isValid(actor)) {
-                table.Add({ "[" + to_string(i) + "]:", UObject::getNameString(actor) , "//" + ToHex(actor) });
+                table.Add({ "[" + to_string(i) + "]:", UStruct::getClassPath(actor) , "//" + ToHex(actor) });
             }
         }
         Dump << table.ToString() << endl;
