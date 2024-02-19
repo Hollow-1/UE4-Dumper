@@ -14,16 +14,16 @@
 
 using namespace std;
 /*
-* ÕâÀïÊµÏÖÒ»¸ö¼òµ¥µÄ»º´æ¹ÜÀí
-* Ã¿´Î´ÓÄÚ´æ¶ÁÈ¡Ö®Ç°£¬ÏÈÅĞ¶ÏÓĞÃ»ÓĞ»º´æ£¬Èç¹ûÃ»ÓĞ£¬¶ÁÈ¡Ò»¸öÄÚ´æÒ³£¨4K£©·Å½ø»º´æ
-* Èç¹û»º´æµÄÒ³´ïµ½×î´óÊıÁ¿£¬ÏÈÒÆ³ı×î¾ÉµÄ»º´æÔÙÌí¼Ó
-* Èç¹ûÒª¶ÁÈ¡µÄÊı¾İ¿çÔ½Ò³±ß¾à£¬Ôò¶ÁÈ¡¶à¸öÒ³£¬È»ºóÆ´½ÓÊı¾İ
-* Çå³ı»º´æµÄÊ±ºò£¬½«ÒÑ¾­·ÖÅäµÄÄÚ´æ¿é·Å½ø freeList ÒÔ±ã¸´ÓÃ
+* è¿™é‡Œå®ç°ä¸€ä¸ªç®€å•çš„ç¼“å­˜ç®¡ç†
+* æ¯æ¬¡ä»å†…å­˜è¯»å–ä¹‹å‰ï¼Œå…ˆåˆ¤æ–­æœ‰æ²¡æœ‰ç¼“å­˜ï¼Œå¦‚æœæ²¡æœ‰ï¼Œè¯»å–ä¸€ä¸ªå†…å­˜é¡µï¼ˆ4Kï¼‰æ”¾è¿›ç¼“å­˜
+* å¦‚æœç¼“å­˜çš„é¡µè¾¾åˆ°æœ€å¤§æ•°é‡ï¼Œå…ˆç§»é™¤æœ€æ—§çš„ç¼“å­˜å†æ·»åŠ 
+* å¦‚æœè¦è¯»å–çš„æ•°æ®è·¨è¶Šé¡µè¾¹è·ï¼Œåˆ™è¯»å–å¤šä¸ªé¡µï¼Œç„¶åæ‹¼æ¥æ•°æ®
+* æ¸…é™¤ç¼“å­˜çš„æ—¶å€™ï¼Œå°†å·²ç»åˆ†é…çš„å†…å­˜å—æ”¾è¿› freeList ä»¥ä¾¿å¤ç”¨
 */
 class MemoryManager : public Singleton<MemoryManager> {
 private:
 	const DWORD PAGE_SIZE = 0x1000;  //4096
-	const DWORD MAX_CACHE_SIZE = 0x200; //512 * 4K ×î´ó»º´æ2MB
+	const DWORD MAX_CACHE_SIZE = 0x200; //512 * 4K æœ€å¤§ç¼“å­˜2MB
 
 	std::unordered_map<ULONG_PTR, PBYTE> cache;
 	std::deque<ULONG_PTR> queue;
@@ -31,17 +31,17 @@ private:
 	std::mutex threadLock;
 
 
-//#define _DMA_    //¿ÉÒÔÊ¹ÓÃ DMA £¬Ò²¿ÉÒÔÊ¹ÓÃ windows Ìá¹©µÄº¯Êı
+//#define _DMA_    //å¯ä»¥ä½¿ç”¨ DMA ï¼Œä¹Ÿå¯ä»¥ä½¿ç”¨ windows æä¾›çš„å‡½æ•°
 
 #ifdef _DMA_
 
-//Ê¹ÓÃ DMA ²Ù×÷½ø³ÌºÍÄÚ´æ
+//ä½¿ç”¨ DMA æ“ä½œè¿›ç¨‹å’Œå†…å­˜
 private:
 	VMM_HANDLE hVMM = NULL; //VMMDLL Handle
 
 	bool InitPrivate()
 	{
-		//Èç¹ûÊ¹ÓÃµÄÊÇ DMA °å¿¨£¬ĞèÒª°Ñ vmware ¸ÄÎª fpga
+		//å¦‚æœä½¿ç”¨çš„æ˜¯ DMA æ¿å¡ï¼Œéœ€è¦æŠŠ vmware æ”¹ä¸º fpga
 		char* args[] = { (char*)"",(char*)"-device",(char*)"vmware" };
 		hVMM = VMMDLL_Initialize(3, args);
 
@@ -123,7 +123,7 @@ public:
 	~MemoryManager() {
 		ClearCache();
 		for (auto& ptr : freeList) {
-			delete[] ptr; // Çå¿Õ×ÔÓÉÁĞ±íÖĞµÄÄÚ´æ¿é
+			delete[] ptr; // æ¸…ç©ºè‡ªç”±åˆ—è¡¨ä¸­çš„å†…å­˜å—
 		}
 		VMMDLL_CloseAll();
 	}
@@ -131,7 +131,7 @@ public:
 
 #else
 
-// windows Ìá¹©µÄÓÃÓÚÄÚ´æ£¬½ø³Ì²Ù×÷µÄº¯Êı£¬ÊÊÓÃÓÚÃ»ÓĞ·´×÷±×±£»¤µÄÓÎÏ·
+// windows æä¾›çš„ç”¨äºå†…å­˜ï¼Œè¿›ç¨‹æ“ä½œçš„å‡½æ•°ï¼Œé€‚ç”¨äºæ²¡æœ‰åä½œå¼Šä¿æŠ¤çš„æ¸¸æˆ
 private:
 	HANDLE handle = NULL;
 
@@ -146,7 +146,7 @@ private:
 		}
 		return true;
 	}
-	//Õ­×Ö·û×ª»»Îª¿í×Ö·û£¬Ê¹ÓÃÍê±ÏĞèÒªÊÖ¶¯ÊÍ·Å  delete[] return
+	//çª„å­—ç¬¦è½¬æ¢ä¸ºå®½å­—ç¬¦ï¼Œä½¿ç”¨å®Œæ¯•éœ€è¦æ‰‹åŠ¨é‡Šæ”¾  delete[] return
 	wchar_t* ToWideChar(const char* narrowString)
 	{
 		if (narrowString == NULL) {
@@ -226,13 +226,13 @@ private:
 public:
 
 	template<typename T> void Write(ULONG_PTR address, T& value) {
-		::WriteProcessMemory(handle, (LPCVOID)address, &value, sizeof(T), NULL);
+		::WriteProcessMemory(handle, (LPVOID)address, &value, sizeof(T), NULL);
 	}
 
 	~MemoryManager() {
 		ClearCache();
 		for (auto& ptr : freeList) {
-			delete[] ptr; // Çå¿Õ×ÔÓÉÁĞ±íÖĞµÄÄÚ´æ¿é
+			delete[] ptr; // æ¸…ç©ºè‡ªç”±åˆ—è¡¨ä¸­çš„å†…å­˜å—
 		}
 		::CloseHandle(handle);
 	}
@@ -263,22 +263,22 @@ public:
 	void ClearCache() {
 		std::lock_guard<std::mutex> lock(threadLock);
 		for (auto& pair : cache) {
-			freeList.push_back(pair.second); // ½«»º´æµÄÄÚ´æ¿é¼ÓÈë×ÔÓÉÁĞ±í
+			freeList.push_back(pair.second); // å°†ç¼“å­˜çš„å†…å­˜å—åŠ å…¥è‡ªç”±åˆ—è¡¨
 		}
-		cache.clear(); // Çå³ı»º´æÖĞµÄÊı¾İ
-		queue.clear(); // Çå¿Õ¶ÓÁĞ
+		cache.clear(); // æ¸…é™¤ç¼“å­˜ä¸­çš„æ•°æ®
+		queue.clear(); // æ¸…ç©ºé˜Ÿåˆ—
 	}
 
 	bool Read(ULONG_PTR address, PBYTE buffer, DWORD size, bool noCache = false) {
-		ULONG_PTR start_page = address >> 12;				// ³ı 4096£¬ µÃµ½Ò³±àºÅ
+		ULONG_PTR start_page = address >> 12;				// é™¤ 4096ï¼Œ å¾—åˆ°é¡µç¼–å·
 		ULONG_PTR end_page = (address + size - 1) >> 12;
 
-		ULONG_PTR start_offset = address % PAGE_SIZE;			//µÚÒ»¸öÒ³ÃæµÄ¿ªÊ¼Æ«ÒÆ
-		ULONG_PTR end_offset = start_offset + size - ((end_page - start_page) * PAGE_SIZE);//×îºóÒ»¸öÒ³ÃæµÄ½áÊøÆ«ÒÆ
+		ULONG_PTR start_offset = address % PAGE_SIZE;			//ç¬¬ä¸€ä¸ªé¡µé¢çš„å¼€å§‹åç§»
+		ULONG_PTR end_offset = start_offset + size - ((end_page - start_page) * PAGE_SIZE);//æœ€åä¸€ä¸ªé¡µé¢çš„ç»“æŸåç§»
 		ULONG_PTR data_index = 0;
 
 		{
-			//±£Ö¤Ïß³Ì°²È«
+			//ä¿è¯çº¿ç¨‹å®‰å…¨
 			std::lock_guard<std::mutex> lock(threadLock);
 			for (ULONG_PTR i = start_page; i <= end_page; ++i) {
 
@@ -288,7 +288,7 @@ public:
 					return false;
 				}
 
-				//Æ´½ÓÊı¾İ
+				//æ‹¼æ¥æ•°æ®
 				ULONG_PTR from = (i == start_page) ? start_offset : 0;
 				ULONG_PTR to = (i == end_page) ? end_offset : PAGE_SIZE;
 				ULONG_PTR copy_size = to - from;
@@ -310,10 +310,10 @@ public:
 
 
 private:
-	//»ñÈ¡Ò»¸öÒ³£¬ÓÃÀ´´ÓÖĞ¶ÁÈ¡Êı¾İ
+	//è·å–ä¸€ä¸ªé¡µï¼Œç”¨æ¥ä»ä¸­è¯»å–æ•°æ®
 	PBYTE GetPage(ULONG_PTR pageIndex, bool noCache)
 	{
-		//Èç¹û»º´æÖĞÃ»ÓĞ
+		//å¦‚æœç¼“å­˜ä¸­æ²¡æœ‰
 		if (cache.find(pageIndex) == cache.end()) {
 			PBYTE page_data = ReadPage(pageIndex << 12);
 			if (page_data == NULL) {
@@ -323,12 +323,12 @@ private:
 			queue.push_back(pageIndex);
 			return page_data;
 		}
-		//ÃüÖĞ»º´æ£¬¶øÇÒ¿ÉÒÔÊ¹ÓÃ»º´æ
+		//å‘½ä¸­ç¼“å­˜ï¼Œè€Œä¸”å¯ä»¥ä½¿ç”¨ç¼“å­˜
 		if (noCache == false) {
 			return cache[pageIndex];
 		}
 
-		//ÃüÖĞ»º´æ£¬µ«²»ÄÜÊ¹ÓÃ»º´æ
+		//å‘½ä¸­ç¼“å­˜ï¼Œä½†ä¸èƒ½ä½¿ç”¨ç¼“å­˜
 		PBYTE new_page = ReadPage(pageIndex << 12);
 		if (new_page == NULL) {
 			return NULL;
@@ -337,7 +337,7 @@ private:
 		cache[pageIndex] = new_page;
 		freeList.push_back(old_page);
 
-		//½«Õâ¸öË÷ÒıÒÆ¶¯µ½¶ÓÁĞµÄ×îºó
+		//å°†è¿™ä¸ªç´¢å¼•ç§»åŠ¨åˆ°é˜Ÿåˆ—çš„æœ€å
 		auto it = std::find(queue.begin(), queue.end(), pageIndex);
 		if (it != queue.end()) {
 			queue.erase(it);
@@ -346,10 +346,10 @@ private:
 		return new_page;
 	}
 
-	//»ñÈ¡Ò»¸ö¿ÉÓÃµÄÒ³»º³åÇø£¬ÓÃÀ´´æ´¢Ò³Êı¾İ
+	//è·å–ä¸€ä¸ªå¯ç”¨çš„é¡µç¼“å†²åŒºï¼Œç”¨æ¥å­˜å‚¨é¡µæ•°æ®
 	PBYTE GetPageBuffer()
 	{
-		//¼ì²é»º´æ´óĞ¡£¬Èç¹û´ïµ½×î´ó»º´æ£¬ÒÆ³ı×î¾ÉµÄ»º´æ
+		//æ£€æŸ¥ç¼“å­˜å¤§å°ï¼Œå¦‚æœè¾¾åˆ°æœ€å¤§ç¼“å­˜ï¼Œç§»é™¤æœ€æ—§çš„ç¼“å­˜
 		while (cache.size() >= MAX_CACHE_SIZE)
 		{
 			ULONG_PTR key = queue.front();
@@ -362,11 +362,11 @@ private:
 
 		PBYTE buffer = NULL;
 		if (freeList.empty()) {
-			buffer = new byte[PAGE_SIZE]; // Èç¹û×ÔÓÉÁĞ±íÎª¿Õ£¬Ôò·ÖÅäĞÂÄÚ´æ
+			buffer = new byte[PAGE_SIZE]; // å¦‚æœè‡ªç”±åˆ—è¡¨ä¸ºç©ºï¼Œåˆ™åˆ†é…æ–°å†…å­˜
 		}
 		else {
-			buffer = freeList.front(); // »ñÈ¡ÁĞ±íÖĞµÄµÚÒ»¸öÄÚ´æ¿é
-			freeList.pop_front(); // ÒÆ³ıÁĞ±íÖĞµÄµÚÒ»¸öÄÚ´æ¿é
+			buffer = freeList.front(); // è·å–åˆ—è¡¨ä¸­çš„ç¬¬ä¸€ä¸ªå†…å­˜å—
+			freeList.pop_front(); // ç§»é™¤åˆ—è¡¨ä¸­çš„ç¬¬ä¸€ä¸ªå†…å­˜å—
 		}
 		return buffer;
 	}
@@ -375,7 +375,7 @@ private:
 
 template<typename T> T Read(ULONG_PTR address, bool noCache = false) {
 	T buffer;
-	//Èç¹ûµØÖ·ÌØ±ğĞ¡£¬¿ÉÄÜÊÇ ¿ÕÖ¸Õë + Æ«ÒÆ
+	//å¦‚æœåœ°å€ç‰¹åˆ«å°ï¼Œå¯èƒ½æ˜¯ ç©ºæŒ‡é’ˆ + åç§»
 	if (address < 0x10000)
 	{
 		memset(&buffer, 0, sizeof(T));
